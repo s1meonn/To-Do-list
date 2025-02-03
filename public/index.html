@@ -1,27 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Web site created using create-snowpack-app" />
-    <link rel="stylesheet" type="text/css" href="/index.css" />
-    <title>Snowpack App</title>
-  </head>
-  <body>
-    <img id="img" src="/logo.svg" />
-    <canvas id="canvas"></canvas>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <script type="module" src="/dist/index.js"></script>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List</title>
+  <script src="/dist/index.js" type="module"></script>
+  <style>
+    :root {
+      --bg-color: #f9f9f9;
+      --text-color: #333;
+      --task-bg: #fff;
+      --task-border: #ccc;
+      --button-bg: #28a745;
+      --button-hover-bg: #218838;
+      --delete-btn-bg: #5f2f2f;
+      --filter-btn-active-bg: #2e4658;
+    }
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+    .dark-mode {
+      --bg-color: #121212;
+      --text-color: #f9f9f9;
+      --task-bg: #333;
+      --task-border: #555;
+      --button-bg: #4CAF50;
+      --button-hover-bg: #45a049;
+      --delete-btn-bg: #8b0000;
+      --filter-btn-active-bg: #004658;
+    }
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+    body.dark-mode {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+    .dark-mode #list li {
+      background: var(--task-bg);
+      border-color: var(--task-border);
+    }
+
+    .dark-mode #new-task-form button {
+      background-color: var(--button-bg);
+      color: var(--text-color);
+    }
+
+    .dark-mode #new-task-form button:hover {
+      background-color: var(--button-hover-bg);
+    }
+
+    .dark-mode .delete-btn {
+      background-color: var(--delete-btn-bg);
+      color: var(--text-color);
+    }
+
+    .dark-mode .filter-btn.active {
+      background-color: var(--filter-btn-active-bg);
+      color: var(--text-color);
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: var(--text-color);
+    }
+
+    #list {
+      list-style: none;
+      padding: 0;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    #list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border: 1px solid var(--task-border);
+      border-radius: 5px;
+      margin-bottom: 10px;
+      background: var(--task-bg);
+    }
+
+    #new-task-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 20px;
+    }
+
+    #new-task-form input[type="text"], #new-task-form input[type="date"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid var(--task-border);
+      border-radius: 5px;
+    }
+
+    #new-task-form button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: var(--button-bg);
+      color: white;
+      cursor: pointer;
+    }
+
+    #new-task-form button:hover {
+      background-color: var(--button-hover-bg);
+    }
+
+    .delete-btn {
+      margin-left: 10px;
+      padding: 4px 8px;
+      background-color: var(--delete-btn-bg);
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .filter-btn.active {
+      background-color: var(--filter-btn-active-bg);
+      color: white;
+    }
+
+    label span {
+      font-style: initial;
+      font-size: 13px;
+      margin-left: 130px;
+      color: var(--text-color);
+    }
+
+    #list li .due-date {
+      display: none;
+    }
+
+    #list li:hover .due-date {
+      display: inline;
+    }
+    #toggle-theme {
+      background-color: var(--button-bg);
+      color: var(--text-color);
+    }
+    </style>
+</head>
+<body>
+  <h1>To-Do List</h1>
+  <div class="filters">
+    <button id="filter-all" class="filter-btn active">All</button>
+    <button id="filter-active" class="filter-btn">Active</button>
+    <button id="filter-completed" class="filter-btn">Completed</button>
+    <button id="toggle-theme">Toggle Theme</button>
+  </div>
+  <ul id="list"></ul>
+  <form id="new-task-form">
+    <input type="text" id="new-task-title" placeholder="Add a new task..." />
+    <input type="date" id="new-task-due-date" />
+    <button type="submit">Add Task</button>
+  </form>
+</body>
 </html>
