@@ -5,7 +5,6 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>To-Do List</title>
-  <script src="/dist/index.js" type="module"></script>
   <style>
     :root {
       --bg-color: #f9f9f9;
@@ -17,7 +16,7 @@
       --delete-btn-bg: #5f2f2f;
       --filter-btn-active-bg: #2e4658;
     }
-
+    
     .dark-mode {
       --bg-color: #121212;
       --text-color: #f9f9f9;
@@ -28,7 +27,8 @@
       --delete-btn-bg: #8b0000;
       --filter-btn-active-bg: #004658;
     }
-
+    
+    
     body.dark-mode {
       background-color: var(--bg-color);
       color: var(--text-color);
@@ -37,26 +37,38 @@
       background: var(--task-bg);
       border-color: var(--task-border);
     }
-
+    
     .dark-mode #new-task-form button {
       background-color: var(--button-bg);
       color: var(--text-color);
     }
-
+    
     .dark-mode #new-task-form button:hover {
       background-color: var(--button-hover-bg);
     }
-
+    
     .dark-mode .delete-btn {
       background-color: var(--delete-btn-bg);
       color: var(--text-color);
     }
-
+    
     .dark-mode .filter-btn.active {
       background-color: var(--filter-btn-active-bg);
       color: var(--text-color);
     }
-
+    
+    body:not(.dark-mode) #new-task-form input[type="text"],
+    body:not(.dark-mode) #new-task-form input[type="date"] {
+      background-color: var(--task-bg);
+      color: var(--text-color);
+    }
+    
+    body.dark-mode #new-task-form input[type="text"],
+    body.dark-mode #new-task-form input[type="date"] {
+      background-color: var(--task-bg);
+      color: var(--text-color);
+    }
+    
     body {
       font-family: Arial, sans-serif;
       background-color: var(--bg-color);
@@ -67,19 +79,20 @@
       flex-direction: column;
       align-items: center;
     }
-
+    
     h1 {
       color: var(--text-color);
     }
-
+    
     #list {
       list-style: none;
       padding: 0;
       width: 100%;
       max-width: 400px;
     }
-
+    
     #list li {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -89,7 +102,7 @@
       margin-bottom: 10px;
       background: var(--task-bg);
     }
-
+    
     #new-task-form {
       display: flex;
       flex-direction: column;
@@ -98,15 +111,15 @@
       max-width: 400px;
       margin-bottom: 20px;
     }
-
+    
     #new-task-form input[type="text"], #new-task-form input[type="date"] {
-      width: 100%;
+      width: calc(100% - 20px);
       padding: 10px;
       margin-bottom: 10px;
       border: 1px solid var(--task-border);
       border-radius: 5px;
     }
-
+    
     #new-task-form button {
       padding: 10px 20px;
       border: none;
@@ -115,44 +128,126 @@
       color: white;
       cursor: pointer;
     }
-
+    
     #new-task-form button:hover {
       background-color: var(--button-hover-bg);
     }
-
+    
     .delete-btn {
-      margin-left: 10px;
-      padding: 4px 8px;
-      background-color: var(--delete-btn-bg);
-      color: white;
+      display: none;
+      padding: 2px;
+      background-color: transparent;
+      color: inherit;
       border: none;
       border-radius: 3px;
+      font-size: 12px;
       cursor: pointer;
     }
-
+    
+    body.dark-mode #list .delete-btn {
+      background-color: transparent;
+      color: inherit;
+    }
+    
+    #list li:hover .delete-btn {
+      display: inline-block;
+    }
+    
+    .filters{
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .filter-btn {
+      padding: 8px 16px;
+      font-size: 14px;
+      border: none;
+      border-radius: 20px;
+      background-color: var(--button-bg);
+      color: white;
+      cursor: pointer;
+      transition: 0.3s all ease;
+    }
+    
     .filter-btn.active {
       background-color: var(--filter-btn-active-bg);
-      color: white;
+      box-shadow: inset 0 0 0 2px white; /* Вътрешна рамка за активния бутон */
     }
-
+    
+    .filter-btn:hover {
+      background-color: var(--button-hover-bg);
+      transform: translateY(-2px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
     label span {
       font-style: initial;
       font-size: 13px;
       margin-left: 130px;
       color: var(--text-color);
     }
-
+    
     #list li .due-date {
       display: none;
+      position: absolute;
+      background-color: var(--task-bg);
+      color: var(--text-color);
+      border: 1px solid var(--task-border);
+      border-radius: 3px;
+      padding: 5px 10px;
+      z-index: 1000;
+      bottom: calc(100% + 5px);
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.9em;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      white-space: nowrap;
     }
-
+    
     #list li:hover .due-date {
-      display: inline;
+      display: block;
     }
+    
     #toggle-theme {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      margin-left: auto;
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 20px;
       background-color: var(--button-bg);
       color: var(--text-color);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
+    
+    #toggle-theme:hover {
+      background-color: var(--button-hover-bg);
+      transform: translateY(-2px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .task-input-container {
+      position: relative;
+      width: 100%;
+    }
+    
+    #new-task-title {
+      width: calc(100% - 30px);
+      padding-right: 30px;
+    }
+    
+    .calendar-icon{
+      position: absolute;
+      right: 10px;
+      top: 40%;
+      transform: translateY(-50%);
+      cursor: pointer
+    }
+    
     </style>
 </head>
 <body>
@@ -161,13 +256,18 @@
     <button id="filter-all" class="filter-btn active">All</button>
     <button id="filter-active" class="filter-btn">Active</button>
     <button id="filter-completed" class="filter-btn">Completed</button>
-    <button id="toggle-theme">Toggle Theme</button>
   </div>
+  <button id='sort-by-date' class="filter-btn">Sort By Date</button>
   <ul id="list"></ul>
   <form id="new-task-form">
-    <input type="text" id="new-task-title" placeholder="Add a new task..." />
-    <input type="date" id="new-task-due-date" />
+    <div class="task-input-container">
+      <input type="text" id="new-task-title" placeholder="Add a new task..." />
+      <span class="calendar-icon">📅</span>
+    </div>
+    <input type="date" id="new-task-due-date" lang="bg" style="display: none;" />
     <button type="submit">Add Task</button>
   </form>
+  <button id="toggle-theme">Toggle Theme</button>
+  <script src="/dist/index.js" type="module"></script>
 </body>
 </html>
