@@ -1,11 +1,13 @@
 import { v4 as uuidV4 } from "uuid" //v4 е функция за генериране на ID от библиотека uuid
+import toastr from 'toastr';
 
 type Task = { //тук дефинираме типа Task ,който описва структурата на един обект 'task'
   id: string,
   title: string,
   completed: boolean,
   createdAt: Date,
-  dueDate?: Date
+  dueDate?: Date,
+  notified: boolean,
 }
 const dueDateInput = document.getElementById("new-task-due-date") as HTMLInputElement | null;
 const list = document.querySelector<HTMLUListElement>("#list") //намира html елемент който е <ul> ,това ще бъде списъка
@@ -28,7 +30,8 @@ form?.addEventListener("submit", e => { //проверяваме дали form �
       title: input.value,
       completed: false,
       createdAt: new Date(),
-      dueDate: dueDateValue
+      dueDate: dueDateValue,
+      notified: false,
     }
     tasks.push(newTask) //добавя нова задача в масива tasks
     saveTasks() //извиква функцията за да запази задачите в локалното хранилище
@@ -59,10 +62,21 @@ function addListItem(task: Task) {
     deleteTask(task.id) //след това изтрива задачата от масива и запазва
   })
 
+  label.append(checkbox, task.title);
+
+  if (task.dueDate) {
+    const dueDateElement = document.createElement("span");
+    dueDateElement.textContent = ` Due: ${task.dueDate?.toLocaleDateString()}`;
+    dueDateElement.classList.add("due-date");
+    label.append(dueDateElement);
+  }
+  
+  item.append(label, deleteButton);
+  list?.append(item);
+
   checkbox.type = "checkbox" //задава типа на елемента, което го прави отметка в html
   checkbox.checked = task.completed //определя дали чекбокса трябва да бъде отметнат като решава дали task.complete = true OR false
 
-  label.append(checkbox, task.title) //добавя два елемента (чекбокс и текст)
 
   if (task.dueDate) {
     const dueDateElement = document.createElement("span");
@@ -97,7 +111,7 @@ function deleteTask(id: string) {
   }
 }
 
-function filterTasks(filterType: 'all' | 'active' | 'completed', sortBy : 'dueDate' 
+function filterTasks(filterType: 'all' | 'active' | 'completed', sortBy: 'dueDate'
   | 'createdAt' = 'dueDate') {
   if (list) {
     list.innerHTML = "";
@@ -172,7 +186,7 @@ document.querySelector('.calendar-icon')?.addEventListener('click', function () 
 document.getElementById('sort-by-date')?.addEventListener('click', () => {
   const activeFilter = document.querySelector('.filter-btn.active')?.id.replace('filter-', '');
   if (activeFilter) {
-    filterTasks(activeFilter as 'all' | 'active' | 'completed' , 'dueDate');
+    filterTasks(activeFilter as 'all' | 'active' | 'completed', 'dueDate');
   } else {
     filterTasks('all', 'dueDate')
   }
@@ -182,3 +196,39 @@ document.getElementById('sort-by-date')?.addEventListener('click', () => {
   });
   document.getElementById('sort-by-date')?.classList.add('active')
 })
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  setInterval(() => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); 
+
+    tasks.forEach(task => {
+      if (task.dueDate) {
+        const dueDateOnly = new Date(task.dueDate.getFullYear(), task.dueDate.getMonth(), task.dueDate.getDate());
+        
+        if (dueDateOnly < today && !task.completed && !task.notified) {
+          task.notified = true;
+          toastr.warning(`Task "${task.title}" is overdue!`, 'Attention', {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "showDuration": 300,
+            "hideDuration": 1000,
+            "timeOut": 5000,
+            "extendedTimeOut": 1000,
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+          });
+        }
+      }
+    });
+  }, 5000);
+});
+
